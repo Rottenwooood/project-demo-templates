@@ -1,0 +1,13 @@
+{
+  "name": "my-app-core",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "bun test src/**/*.test.ts"
+  },
+  "devDependencies": {
+    "bun-types": "^1.1.0"
+  }
+}

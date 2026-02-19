@@ -1,0 +1,5 @@
+# Playwright E2E tests are in .e2e-tests/ directory
+# Run them with: npx playwright test
+
+.e2e-tests/
+**/*.playwright.spec.ts

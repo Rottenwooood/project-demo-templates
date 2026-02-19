@@ -1,0 +1,30 @@
+{
+  "name": "my-app",
+  "version": "0.0.1",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"bun run dev:web\" \"bun run dev:server\"",
+    "dev:web": "bun run --cwd apps/web dev",
+    "dev:server": "bun run --cwd packages/server dev",
+    "build": "bun run build:web && bun run build:server",
+    "build:web": "bun run --cwd apps/web build",
+    "build:server": "bun run --cwd packages/server build",
+    "test": "bun run test:server",
+    "test:server": "bun run --cwd packages/server test",
+    "test:e2e": "npx playwright test",
+    "verify": "./verify.sh",
+    "lint": "bun run --recursive lint",
+    "format": "bun run --recursive format"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0",
+    "bun": "^1.1.0",
+    "concurrently": "^9.0.0",
+    "@playwright/test": "^1.40.0"
+  },
+  "type": "module"
+}

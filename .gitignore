@@ -1,0 +1,36 @@
+# Dependencies
+node_modules
+
+# Build outputs
+dist
+build
+*.tsbuildinfo
+
+# SQLite databases
+*.sqlite
+*.db
+
+# Uploads / temp files
+uploads/
+*.tmp
+*.log
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test outputs
+test-results/
+playwright-report/
+*.playwright.spec.ts-snapshots
+
+# Environment
+.env
+.env.local
+.env.*.local
