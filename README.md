@@ -1,16 +1,30 @@
 # my-app 项目模板
 
-一个开箱即用的 Bun + React + Hono 全栈项目模板，内置自动化测试闭环。
+一个专为 AI 设计的**可闭环验证**的全栈项目模板，基于 Bun + React + Hono。
 
-## 特性
+## 核心特性：AI 友好 + 自动化验证
 
-- **Monorepo 架构**：基于 Bun Workspaces，packages 和 apps 分离
-- **后端**：Hono + Bun + TypeScript，高性能 API 服务
-- **前端**：React + Vite + Tailwind CSS + TanStack Query
-- **自动化测试**：
-  - Bun Test：后端 API 测试
-  - Playwright：E2E 冒烟测试，检测控制台错误
-- **已验证**：所有测试通过，无控制台报错
+本模板专为 AI 开发设计，确保每一步修改都能被自动化验证，**无需人工检查即可发现错误**。
+
+### 🔒 闭环验证机制
+
+```
+代码修改 → bun test (后端) → npx playwright test (前端) → 验证通过 ✅
+                                   ↓
+                              检测到错误 → 测试失败 ❌
+```
+
+- **后端测试 (bun test)**：自动验证所有 API 路由返回 200 OK
+- **E2E 测试 (Playwright)**：自动检测浏览器控制台错误、页面崩溃
+- **验证脚本 (verify.sh)**：一键运行所有测试
+
+### 🛡️ 防护措施
+
+| 防护类型 | 检测内容 | 测试工具 |
+|---------|---------|---------|
+| 后端错误 | API 返回错误、异常抛出 | Bun Test |
+| 前端崩溃 | JS 异常、控制台 error | Playwright |
+| 移动端兼容 | 视口渲染错误 | Playwright (手机模式) |
 
 ## 快速开始
 
@@ -23,14 +37,9 @@ cd my-project
 
 ### 2. 替换项目名
 
-将所有 `my-app` 替换为你的实际项目名：
-
 ```bash
 # Linux/Mac
 find . -type f \( -name "*.json" -o -name "*.ts" -o -name "*.tsx" -o -name "*.html" \) -exec sed -i 's/my-app/你的项目名/g' {} \;
-
-# Windows PowerShell
-Get-ChildItem -Recurse -Include *.json,*.ts,*.tsx,*.html | ForEach-Object { (Get-Content $_.FullName) -replace 'my-app', '你的项目名' | Set-Content $_.FullName }
 ```
 
 ### 3. 安装依赖
@@ -39,17 +48,15 @@ Get-ChildItem -Recurse -Include *.json,*.ts,*.tsx,*.html | ForEach-Object { (Get
 bun install
 ```
 
-### 4. 运行测试
+### 4. 运行验证（必做！）
 
 ```bash
-# 后端测试 (Bun Test)
-bun test
-
-# E2E 测试 (Playwright)
-npx playwright test
-
-# 完整验证
+# 完整验证（推荐）
 ./verify.sh
+
+# 或分步执行
+bun test              # 后端 API 测试
+npx playwright test   # 前端 E2E 测试
 ```
 
 ### 5. 启动开发
@@ -60,98 +67,105 @@ bun dev
 
 访问 http://localhost:5173
 
+## 验证流程说明
+
+### 为什么需要闭环验证？
+
+AI 修改代码时常见问题：
+- 忘记更新类型定义 → TypeScript 报错
+- API 路由写错 → 404 错误
+- 引入 JS 运行时错误 → 页面崩溃
+
+**传统方式**：人工测试 → 发现问题 → 反馈 AI → 修复 → 循环...
+
+**本模板方式**：AI 修改 → 自动测试 → 失败自动重试 → 通过 ✅
+
+### 验证流程
+
+```
+1. bun test
+   ├── 测试 /health → 返回 { status: "ok" }
+   ├── 测试 /api/v1/hello → 返回 200
+   └── 测试 /api/v1/echo → POST 正常响应
+
+2. npx playwright test
+   ├── 访问首页 → 检查无控制台错误
+   ├── 访问 /library → 检查无 JS 异常
+   ├── 测试导航 → 检查页面切换正常
+   └── 手机视口 → 检查响应式布局正常
+```
+
+### AI 开发工作流
+
+```bash
+# 1. 理解需求
+# 2. 编写代码
+# 3. 运行验证
+./verify.sh
+
+# 如果失败 → 修复错误 → 重新验证
+# 如果通过 → git add && git commit
+```
+
 ## 项目结构
 
 ```
 my-project/
-├── apps/                      # 应用层
-│   └── web/                   # React 前端
+├── apps/
+│   └── web/                    # React 前端 (Vite)
 │       ├── src/
-│       │   ├── App.tsx       # 主应用组件
-│       │   ├── main.tsx      # 入口文件
-│       │   └── index.css     # 全局样式
-│       ├── package.json
-│       ├── vite.config.ts    # Vite 配置
+│       │   ├── App.tsx        # 路由 + 页面
+│       │   ├── main.tsx       # 入口
+│       │   └── index.css      # Tailwind 样式
+│       ├── vite.config.ts
 │       └── tailwind.config.js
-├── packages/                  # 包层
-│   ├── server/               # Hono 后端
+├── packages/
+│   ├── server/                # Hono 后端
 │   │   ├── src/
-│   │   │   ├── index.ts     # 主服务器
+│   │   │   ├── index.ts       # 路由定义
 │   │   │   └── routes/
 │   │   │       └── __test__/
 │   │   │           └── api.test.ts  # API 测试
 │   │   └── package.json
-│   └── core/                 # 共享工具
+│   └── core/                  # 共享工具
 │       ├── src/
 │       │   ├── index.ts
 │       │   └── index.test.ts
 │       └── package.json
-├── .e2e-tests/              # Playwright E2E 测试
+├── .e2e-tests/               # Playwright 测试
 │   └── smoke.playwright.spec.ts
-├── playwright.config.ts      # Playwright 配置
-├── verify.sh                # 验证脚本
-├── package.json             # 根 workspace 配置
-└── tsconfig.json           # TypeScript 配置
+├── playwright.config.ts
+├── verify.sh                 # 一键验证脚本
+├── package.json
+└── tsconfig.json
 ```
 
 ## 命令
 
-| 命令 | 说明 |
-|------|------|
-| `bun dev` | 启动前后端开发服务器 |
-| `bun test` | 运行后端 Bun Test |
-| `npx playwright test` | 运行 E2E 测试 |
-| `bun run verify` | 完整验证（安装+测试+构建） |
-| `bun run build` | 构建所有包 |
+| 命令 | 说明 | 验证内容 |
+|------|------|---------|
+| `bun test` | 后端测试 | API 路由正确性 |
+| `npx playwright test` | E2E 测试 | 前端无崩溃 |
+| `./verify.sh` | 完整验证 | 所有测试 + 构建 |
+| `bun dev` | 开发服务器 | - |
 
-## 添加新功能
+## 添加新功能指南
 
 ### 1. 添加后端 API
 
-在 `packages/server/src/index.ts` 中添加路由：
-
 ```typescript
-// 添加新路由
+// packages/server/src/index.ts
 apiRouter.get("/api/v1/items", (c) => {
   return c.json({ items: [] });
 });
 
 apiRouter.post("/api/v1/items", async (c) => {
   const body = await c.req.json();
-  // 处理逻辑
-  return c.json({ id: "new-id" }, 201);
+  return c.json({ id: "1" }, 201);
 });
 ```
 
-### 2. 添加前端页面
-
-在 `apps/web/src/App.tsx` 中添加：
-
-```tsx
-import { useState, useEffect } from "react";
-import { useQuery } from "@tanstack/react-query";
-
-function MyPage() {
-  const { data, isLoading } = useQuery({
-    queryKey: ["my-data"],
-    queryFn: async () => {
-      const res = await fetch("/api/v1/items");
-      return res.json();
-    },
-  });
-
-  if (isLoading) return <div>加载中...</div>;
-
-  return <div>{JSON.stringify(data)}</div>;
-}
-
-// 添加路由
-<Route path="/my-page" element={<MyPage />} />
-```
-
-### 3. 添加测试
-
-后端测试（添加到 `packages/server/src/routes/__test__/api.test.ts`）：
+**必须添加测试**（在 `api.test.ts`）：
 
 ```typescript
 describe("Items API", () => {
@@ -163,81 +177,92 @@ describe("Items API", () => {
 });
 ```
 
-E2E 测试（添加到 `.e2e-tests/smoke.playwright.spec.ts`）：
+### 2. 添加前端页面
+
+```tsx
+// apps/web/src/App.tsx
+function ItemsPage() {
+  const { data } = useQuery({
+    queryKey: ["items"],
+    queryFn: () => fetch("/api/v1/items").then(r => r.json()),
+  });
+
+  return <div>{JSON.stringify(data)}</div>;
+}
+
+// 添加路由
+<Route path="/items" element={<ItemsPage />} />
+```
+
+**必须添加 E2E 测试**（在 `smoke.playwright.spec.ts`）：
 
 ```typescript
-test("My page loads without errors", async ({ page }) => {
+test("Items page loads without errors", async ({ page }) => {
   const errors: string[] = [];
-  page.on("console", (msg) => {
+  page.on("console", msg => {
     if (msg.type() === "error") errors.push(msg.text());
   });
-  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("pageerror", err => errors.push(err.message));
 
-  await page.goto("/my-page");
+  await page.goto("/items");
   expect(errors).toHaveLength(0);
 });
 ```
 
-### 4. 验证并提交
+### 3. 验证并提交
 
 ```bash
-# 运行完整验证
+# 每次修改后必须运行
 ./verify.sh
 
-# 提交代码
-git add -A
-git commit -m "feat: 添加新功能"
+# 通过后提交
+git add -A && git commit -m "feat: 添加 items 功能"
 ```
 
-## 已知问题与解决方案
-
-详见 [PROGRESS.md](./PROGRESS.md)
+## 常见问题与解决方案
 
 ### 问题 1：Bun install 超时
 
-- **问题**：`bun install` 在网络慢时卡住
-- **解决**：使用国内镜像：`bun install --registry https://registry.npmmirror.com`
+```bash
+# 使用国内镜像
+bun install --registry https://registry.npmmirror.com
+```
 
 ### 问题 2：Playwright 与 Bun 冲突
 
-- **问题**：`bun test` 报错 "Playwright Test did not expect test.describe()"
-- **原因**：Bun 内置 Playwright 集成，与 @playwright/test 版本冲突
-- **解决**：
-  - Playwright 测试放在 `.e2e-tests/` 目录
-  - 使用 `npx playwright test` 独立运行
-  - Bun test 只运行后端测试
+- **原因**：Bun 内置 Playwright，与 @playwright/test 版本冲突
+- **解决**：Playwright 测试放 `.e2e-tests/`，用 `npx playwright test` 运行
 
 ### 问题 3：React.useQuery is not a function
 
-- **问题**：浏览器控制台报错
-- **原因**：使用 `React.useQuery` 而非直接导入
-- **解决**：
-
 ```tsx
-// 正确
-import { useQuery } from "@tanstack/react-query";
-const { data } = useQuery(...);
-
-// 错误
+// ❌ 错误
 import React from "react";
-const { data } = React.useQuery(...);
+React.useQuery(...)
+
+// ✅ 正确
+import { useQuery } from "@tanstack/react-query";
+useQuery(...)
 ```
 
-### 问题 4：SQL 保留字冲突
+### 问题 4：SQL 保留字
 
-- **问题**：`SQLiteError: near "index": syntax error`
-- **解决**：字段名避开保留字，如用 `chapter_index` 代替 `index`
+- **错误**：`SQLiteError: near "index"`
+- **解决**：字段名避开 SQL 保留字，如用 `chapter_index`
 
 ### 问题 5：better-sqlite3 不支持
 
-- **问题**：`error: 'better-sqlite3' is not yet supported in Bun`
 - **解决**：使用 Bun 原生 `bun:sqlite`
 
 ## 开发规范
 
-### React Hooks 导入
+### 必须遵循
 
-始终从各自包导入 hooks，不要从 React 导入：
+1. **每改必测**：每次代码修改后运行 `./verify.sh`
+2. **测试先行**：先写测试，再写功能
+3. **失败重试**：测试失败自动修复，直到通过
+
+### React Hooks 导入
 
 ```tsx
 // ✅ 正确
@@ -245,14 +270,11 @@ import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
-// ❌ 错误 - 会导致 "React.xxx is not a function"
+// ❌ 错误
 import React from "react";
-const { data } = React.useQuery(...);
 ```
 
-### API 设计
-
-使用 Hono 路由器模式：
+### API 设计模式
 
 ```typescript
 const apiRouter = new Hono();
@@ -264,12 +286,6 @@ apiRouter.delete("/resource/:id", handler);
 
 app.route("/api/v1", apiRouter);
 ```
-
-### 测试
-
-- 后端：使用 Bun Test，每个路由有对应测试
-- E2E：使用 Playwright，检测控制台错误
-- 运行顺序：先 `bun test`，再 `npx playwright test`
 
 ## 依赖版本
 
@@ -283,10 +299,13 @@ app.route("/api/v1", apiRouter);
 | @tanstack/react-query | ^5.0.0 | 数据获取 |
 | @playwright/test | ^1.40.0 | E2E 测试 |
 
-## 基于
+## 模板来源
 
-模板创建基于 EPUB Reader 项目，吸收了所有踩坑经验。
+本模板基于 EPUB Reader 项目开发经验总结，吸收了所有踩坑教训，确保 AI 开发时：
+- 不会因为环境问题卡住
+- 不会因为测试配置问题遗漏错误
+- 不会因为导入顺序问题导致运行时崩溃
 
 ---
 
-如有问题，请查看 [PROGRESS.md](./PROGRESS.md) 或提交 Issue。
+**使用本模板时，每次代码修改后运行 `./verify.sh` 进行验证。**
