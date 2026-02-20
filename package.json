@@ -21,10 +21,10 @@
     "format": "bun run --recursive format"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
+    "@playwright/test": "^1.58.2",
     "bun": "^1.1.0",
     "concurrently": "^9.0.0",
-    "@playwright/test": "^1.40.0"
+    "typescript": "^5.5.0"
   },
   "type": "module"
 }

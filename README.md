@@ -28,71 +28,42 @@
 
 ## 快速开始
 
-### 1. 复制模板
+### 1. 克隆模板
 
 ```bash
-cp -r template my-project
+git clone <模板仓库地址> my-project
 cd my-project
 ```
 
-### 2. 替换项目名
-
-```bash
-# Linux/Mac
-find . -type f \( -name "*.json" -o -name "*.ts" -o -name "*.tsx" -o -name "*.html" \) -exec sed -i 's/my-app/你的项目名/g' {} \;
-```
-
-### 3. 安装依赖
+### 2. 安装依赖
 
 ```bash
 bun install
 ```
 
-### 4. 运行验证（必做！）
+### 3. 启动 AI 开发
 
-```bash
-# 完整验证（推荐）
+在当前目录打开终端，给 Claude Code 发送：
+
+```
+阅读约束.MD，根据当前的半成品模板，实现以下需求：『用户的需求』
+```
+
+### 4. 等待验证
+
+AI 会自动：
+1. 理解需求
+2. 编写代码
+3. 运行 `./verify.sh` 验证
+4. 如有错误自动修复
+5. 验证通过后通知你
+
+## 验证流程
+
+```
 ./verify.sh
-
-# 或分步执行
-bun test              # 后端 API 测试
-npx playwright test   # 前端 E2E 测试
-```
-
-### 5. 启动开发
-
-```bash
-bun dev
-```
-
-访问 http://localhost:5173
-
-## 验证流程说明
-
-### 为什么需要闭环验证？
-
-AI 修改代码时常见问题：
-- 忘记更新类型定义 → TypeScript 报错
-- API 路由写错 → 404 错误
-- 引入 JS 运行时错误 → 页面崩溃
-
-**传统方式**：人工测试 → 发现问题 → 反馈 AI → 修复 → 循环...
-
-**本模板方式**：AI 修改 → 自动测试 → 失败自动重试 → 通过 ✅
-
-### 验证流程
-
-```
-1. bun test
-   ├── 测试 /health → 返回 { status: "ok" }
-   ├── 测试 /api/v1/hello → 返回 200
-   └── 测试 /api/v1/echo → POST 正常响应
-
-2. npx playwright test
-   ├── 访问首页 → 检查无控制台错误
-   ├── 访问 /library → 检查无 JS 异常
-   ├── 测试导航 → 检查页面切换正常
-   └── 手机视口 → 检查响应式布局正常
+├── bun test              # 后端 API 测试
+└── npx playwright test   # 前端 E2E 测试
 ```
 
 ### AI 开发工作流
@@ -142,12 +113,12 @@ my-project/
 
 ## 命令
 
-| 命令 | 说明 | 验证内容 |
-|------|------|---------|
-| `bun test` | 后端测试 | API 路由正确性 |
-| `npx playwright test` | E2E 测试 | 前端无崩溃 |
-| `./verify.sh` | 完整验证 | 所有测试 + 构建 |
-| `bun dev` | 开发服务器 | - |
+| 命令 | 说明 |
+|------|------|
+| `bun test` | 后端测试 |
+| `npx playwright test` | 前端 E2E 测试 |
+| `./verify.sh` | 完整验证 |
+| `bun dev` | 开发服务器 |
 
 ## 添加新功能指南
 
