@@ -10,8 +10,8 @@
 
 ```
 代码修改 → bun test (后端) → npx playwright test (前端) → 验证通过 ✅
-                                   ↓
-                              检测到错误 → 测试失败 ❌
+   ↑                               ↓
+  反馈    ←   测试失败 ❌    ←    检测到错误
 ```
 
 - **后端测试 (bun test)**：自动验证所有 API 路由返回 200 OK
@@ -35,9 +35,11 @@ git clone <模板仓库地址> my-project
 cd my-project
 ```
 
-### 2. 安装依赖
+### 2. 安装Bun(仅一次) & 依赖
 
 ```bash
+curl -fsSL https://bun.sh/install | bash
+
 bun install
 ```
 
