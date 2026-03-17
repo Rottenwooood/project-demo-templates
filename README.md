@@ -31,8 +31,8 @@
 ### 1. 克隆模板
 
 ```bash
-git clone <模板仓库地址> my-project
-cd my-project
+git clone https://github.com/Rottenwooood/project-demo-templates.git
+cd project-demo-templates
 ```
 
 ### 2. 安装Bun(仅一次) & 依赖
@@ -45,10 +45,15 @@ bun install
 
 ### 3. 启动 AI 开发
 
+启动前后端服务器（热重载）
+```
+bun dev
+```
+
 在当前目录打开终端，给 Claude Code 发送：
 
 ```
-阅读约束.MD，根据当前的半成品模板，实现以下需求：『用户的需求』
+阅读 @约束.MD，根据当前的半成品模板，实现以下需求：『用户的需求』
 ```
 
 ### 4. 等待验证
